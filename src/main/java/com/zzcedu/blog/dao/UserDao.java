@@ -10,6 +10,11 @@ import java.util.List;
  * @Date: 2020/12/29 15:35
  */
 public interface UserDao {
-    @Select("select * from cn_user")
-    List<User> findAll();
+    /**
+     * 根据名字查询用户信息
+     * @param username
+     * @return 用户信息
+     */
+    @Select("select * from cn_user where cn_user_name = #{username}")
+    User findByName(String username);
 }

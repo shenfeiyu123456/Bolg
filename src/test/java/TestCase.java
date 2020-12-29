@@ -12,6 +12,6 @@ public class TestCase {
     public void test1(){
         ApplicationContext ac = new ClassPathXmlApplicationContext("spring.xml");
         UserDao userDao = ac.getBean("userDao", UserDao.class);
-        System.out.println(userDao.findAll());
+
     }
 }
