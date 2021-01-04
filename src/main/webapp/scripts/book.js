@@ -49,3 +49,49 @@ function createBookLi(bookId,bookName){
     //在book_ul下追加li
     $("#book_ul").append($lis);
 }
+
+/**
+ * 笔记本的创建
+ */
+function addBook() {
+    //1.获取请求参数
+    //笔记本名称
+    var bookName = $("#input_notebook").val().trim();
+    //用户ID
+    var userId = getCookie("uid");
+    //2.参数格式校验
+    ok = true;
+    if(bookName == ""){
+        ok = false;
+        $("#notebook_span").html("笔记本名称为空");
+    }
+    if(userId == null){
+        ok = false;
+        window.location.href = "log_in.html";
+    }
+    if(ok){
+        //3.发送Ajax
+        $.ajax({
+            url:base_path+"/book/add.do",
+            type:"post",
+            data:{"userId":userId,"bookName":bookName},
+            dataType:"json",
+            success:function (result) {
+                //1.关闭对话框
+                closeAlertWindow();
+                if(result.status == 0){
+                    //获取bookId
+                    var bookId = result.data.cn_notebook_id;
+                    //2.将新创建的笔记本添加到li中
+                    createBookLi(bookId,bookName);
+                }
+                //3.弹出提示框
+                alert(result.msg);
+            },
+            error:function () {
+                alert("创建笔记异常");
+            }
+        });
+    }
+
+}

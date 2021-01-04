@@ -13,4 +13,6 @@ public interface BookService {
      * @return Json响应实体类
      */
     JsonResult loadUserBooks(String userId);
+
+    JsonResult addBook(String userId, String bookName);
 }

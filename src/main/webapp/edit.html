@@ -298,8 +298,43 @@
 		<script>
 			//页面加载事件
 			$(function () {
+				//1.加载用户笔记本
 				loadUserBook();
+				//2.给笔记本li绑定单击处理(动态绑定)
+				$("#book_ul").on("click","li",loadBookNotes);
+				//3.给笔记li绑定单击处理(动态绑定)
+				$("#note_ul").on("click","li",loadNote);
+				//4.绑定保存笔记按钮
+				$("#save_note").click(updateNote);
+				//5.关闭对话框(对所有的对话框都有用)
+				$("#can").on("click",".cancle,.close",closeAlertWindow);
+				//6.弹出创建笔记本的对话框
+				$("#add_notebook").click(alertAddBookWindow);
+				//7.创建笔记本的确定按钮的绑定(动态绑定)
+				$("#can").on("click","#sure_addbook",addBook);
 			});
 		</script>
-	</body>		
+		<!-- Bootstrap框架JS -->
+		<script src="scripts/bootstrap.min.js"></script>
+		<script src="scripts/js-prototype.js"></script>
+		<script src="scripts/theme-setup.js"></script>
+		<!-- Google-Code代码高亮JS -->
+		<script class="re-execute" src="scripts/run_prettify.js"></script>
+		<!-- Ueditor编辑器JS -->
+		<script type="text/javascript" charset="utf-8" src="scripts/ue/umeditor.config.js"></script>
+		<script type="text/javascript" charset="utf-8" src="scripts/ue/umeditor.min.js"></script>
+		<script type="text/javascript" src="scripts/ue/lang/zh-cn.js"></script>
+		<script type="text/javascript">
+			//重写JS原生alert函数
+
+			window.alert=function(e){
+				$('#can').load('./alert/alert_error.html',function(){
+					$('#error_info').text(' '+e);
+					$('.opacity_bg').show();
+				});
+			}
+			//实例化Ueditor编辑器
+			var um = UM.getEditor('myEditor');
+		</script>
+	</body>
 </html>
