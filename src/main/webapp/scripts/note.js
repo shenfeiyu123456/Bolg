@@ -121,3 +121,100 @@ function updateNote() {
         }
 
 }
+
+/**
+ * 创建笔记
+ */
+function addNote() {
+    //1.获取参数
+    var userId = getCookie("uid");
+    var bookId = $("#book_ul a.checked").parent().data("bookId");
+    var noteTitle = $("#input_note").val().trim();
+    $("#note_span").html = "";
+    //2.参数格式校验
+    var ok = true;
+    if(userId == null){
+        ok = false;
+        window.location.href = "log_in.html";
+    }
+    if(noteTitle == ""){
+        ok = false;
+        $("#note_span").html("笔记名不能为空");
+    }
+    if(ok){
+        //3.发送Ajax
+        $.ajax({
+            url:base_path+"/note/add.do",
+            type:"post",
+            data:{"userId":userId,"bookId":bookId,"noteTitle":noteTitle},
+            dataType:"json",
+            success:function (result) {
+                //1.关闭对话框
+                closeAlertWindow();
+                if(result.status == 0){
+                    //2.添加新的noteLi
+                    var noteId = result.data.cn_note_id;
+                    var noteTitle = result.data.cn_note_title;
+                    createNoteLi(noteId,noteTitle);
+                }
+                //3.弹出提示信息
+                alert(result.msg)
+            },
+            error:function () {
+                alert("创建笔记异常");
+            }
+        });
+    }
+
+}
+
+/**
+ * 笔记菜单的显示
+ */
+function showMenu() {
+    hideMenu();
+    //this:指的是下拉菜单按钮
+    var $menu = $(this).parent().next()
+    $menu.slideDown(1000);
+    $("#note_ul a").removeClass("checked");
+    $(this).parent().addClass("checked");
+    //jQuery解决冒泡事件
+    return false;
+}
+
+/**
+ * 隐藏笔记菜单
+ */
+function hideMenu() {
+    $("#note_ul div").hide();
+}
+
+/**
+ * 删除笔记操作
+ */
+function deleteNote() {
+    //1.获取请求参数
+    var $li = $("#note_ul a.checked").parent();
+    var noteId = $li.data("noteId");
+    //2.参数格式校验
+    //3.发送Ajax
+    $.ajax({
+        url:base_path+"/note/delete.do",
+        type:"post",
+        data:{"noteId":noteId},
+        dataType:"json",
+        success:function (result) {
+            //1.关闭删除对话框
+            closeAlertWindow();
+            if(result.status == 0){
+                //2.删除对应的li
+                $li.remove();
+            }
+            //提示信息
+            alert(result.msg);
+        },
+        error:function () {
+            alert("删除笔记异常")
+        }
+    });
+}

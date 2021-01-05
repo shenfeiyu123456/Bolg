@@ -312,6 +312,18 @@
 				$("#add_notebook").click(alertAddBookWindow);
 				//7.创建笔记本的确定按钮的绑定(动态绑定)
 				$("#can").on("click","#sure_addbook",addBook);
+				//8.弹出创建笔记的对话框
+				$("#add_note").click(alertAddNoteWindow);
+				//9.创建笔记的确定按钮的绑定(动态绑定)
+				$("#can").on("click","#sure_addnote",addNote);
+				//10.弹出笔记菜单
+				$("#note_ul").on("click",".btn_slide_down",showMenu);
+				//11.点击页码隐藏笔记菜单
+				$("body").click(hideMenu);
+				//12.删除笔记弹窗的弹出
+				$("#note_ul").on("click",".btn_delete",alertDeleteNoteWindow);
+				//13.删除弹窗确定按钮的绑定
+				$("#can").on("click","#sure_deletenote",deleteNote);
 			});
 		</script>
 		<!-- Bootstrap框架JS -->

@@ -21,4 +21,8 @@ public interface NoteService {
     JsonResult loadNote(String noteId);
 
     JsonResult updateNote(String title, String body, String noteId);
+
+    JsonResult addNote(String userId, String bookId, String noteTitle);
+
+    JsonResult deleteNote(String noteId);
 }

@@ -18,4 +18,8 @@ public interface NoteDao {
     Note findById(String noteId);
     @Update("update cn_note set cn_note_title = #{cn_note_title},cn_note_body= #{cn_note_body},cn_note_last_modify_time = #{cn_note_last_modify_time} where cn_note_id = #{cn_note_id}")
     int update(Note note);
+    @Insert("insert into cn_note(cn_note_id,cn_note_title,cn_notebook_id,cn_user_id,cn_note_status_id,cn_note_type_id,cn_note_create_time,cn_note_last_modify_time,cn_note_body) values(#{cn_note_id},#{cn_note_title},#{cn_notebook_id},#{cn_user_id},#{cn_note_status_id},#{cn_note_type_id},#{cn_note_create_time},#{cn_note_last_modify_time},#{cn_note_body})")
+    int save(Note note);
+    @Update("update cn_note set cn_note_status_id = '2' where cn_note_id = #{noteId}")
+    int updateStatus(String noteId);
 }
