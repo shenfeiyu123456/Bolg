@@ -27,6 +27,11 @@ function loadBookNotes() {
                 var noteTitle = notes[i].cn_note_title;
                 //创建一个笔记li元素
                 createNoteLi(noteId,noteTitle);
+                if(notes[i].cn_note_type_id == '2'){
+                    //此时这个笔记已经被分享，应该加上分享图标
+                    var img = '<i class="fa fa-sitemap"></i>';
+                    $("#note_ul li:last").find(".btn_slide_down").before(img);
+                }
             }
         },
         error:function () {
@@ -215,6 +220,65 @@ function deleteNote() {
         },
         error:function () {
             alert("删除笔记异常")
+        }
+    });
+}
+
+/**
+ * 移动笔记
+ */
+function moveNote() {
+    //1.获取参数
+    var $li = $("#note_ul a.checked").parent();
+    var noteId = $li.data("noteId");
+    //获取移动到的笔记ID
+    var bookId = $("#moveSelect").val();
+    //2.参数格式校验
+    //3.发送Ajax
+    $.ajax({
+        url:base_path+"/note/move.do",
+        type:"post",
+        data:{"noteId":noteId,"bookId":bookId},
+        dataType:"json",
+        success:function (result) {
+            if(result.status == 0){
+                //1.删除选中的笔记
+                $li.remove();
+            }
+            //弹窗提示信息
+            alert(result.msg);
+        },
+        error:function () {
+            alert("移动笔记异常");
+        }
+    });
+}
+
+/**
+ * 分享笔记
+ */
+function shareNote() {
+    //1.获取请求参数
+    //获取选中的笔记ID
+    var $li = $("#note_ul a.checked").parent();
+    var noteId = $li.data("noteId");
+    //2.参数格式校验
+    //3.发送Ajax
+    $.ajax({
+        url:base_path+"/note/share.do",
+        type:"post",
+        data:{"noteId":noteId},
+        dataType:"json",
+        success:function (result) {
+            if(result.status == 0){
+                //添加分享标记
+                var img = '<i class="fa fa-sitemap"></i>';
+                $li.find(".btn_slide_down").before(img);
+            }
+            alert(result.msg);
+        },
+        error:function () {
+            alert("分享笔记异常");
         }
     });
 }

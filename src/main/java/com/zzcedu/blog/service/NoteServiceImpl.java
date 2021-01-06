@@ -1,10 +1,13 @@
 package com.zzcedu.blog.service;
 
 import com.zzcedu.blog.dao.NoteDao;
+import com.zzcedu.blog.dao.ShareDao;
 import com.zzcedu.blog.entity.Note;
+import com.zzcedu.blog.entity.Share;
 import com.zzcedu.blog.util.JsonResult;
 import com.zzcedu.blog.util.NoteUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -17,6 +20,8 @@ import java.util.List;
 public class NoteServiceImpl implements NoteService{
     @Resource
     private NoteDao noteDao;
+    @Resource
+    private ShareDao shareDao;
     @Override
     public JsonResult loadNotes(String bookId) {
         JsonResult noteResult = new JsonResult();
@@ -41,7 +46,7 @@ public class NoteServiceImpl implements NoteService{
     public JsonResult updateNote(String title, String body, String noteId) {
         JsonResult jsonResult = new JsonResult();
         Note note = Note.builder().cn_note_id(noteId).cn_note_title(title).cn_note_body(body).cn_note_last_modify_time(System.currentTimeMillis()).build();
-        int i = noteDao.update(note);
+        int i = noteDao.dynamicUpdate(note);
         if(i > 0){
             jsonResult.setMsg("保存笔记成功");
             jsonResult.setStatus(0);
@@ -72,7 +77,8 @@ public class NoteServiceImpl implements NoteService{
     @Override
     public JsonResult deleteNote(String noteId) {
         JsonResult jsonResult = new JsonResult();
-        int i = noteDao.updateStatus(noteId);
+        Note note = Note.builder().cn_note_id(noteId).cn_note_status_id("2").build();
+        int i = noteDao.dynamicUpdate(note);
         if(i > 0){
             jsonResult.setStatus(0);
             jsonResult.setMsg("删除笔记成功");
@@ -81,5 +87,44 @@ public class NoteServiceImpl implements NoteService{
         jsonResult.setStatus(1);
         jsonResult.setMsg("删除笔记失败");
         return jsonResult;
+    }
+
+    @Override
+    public JsonResult moveNote(String noteId, String bookId) {
+        JsonResult jsonResult = new JsonResult();
+        Note note = Note.builder().cn_note_id(noteId).cn_notebook_id(bookId).build();
+        int i = noteDao.dynamicUpdate(note);
+        if(i > 0){
+            jsonResult.setStatus(0);
+            jsonResult.setMsg("移动笔记成功");
+            return jsonResult;
+        }
+        jsonResult.setStatus(1);
+        jsonResult.setMsg("移动笔记失败");
+        return jsonResult;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public JsonResult shareNote(String noteId) {
+        JsonResult jsonResult = new JsonResult();
+        //1.查询笔记是否被分享过
+        Note note = noteDao.findById(noteId);
+        if(note.getCn_note_type_id().equals("2")){
+            jsonResult.setStatus(1);
+            jsonResult.setMsg("该笔记已经被分享过了");
+            return jsonResult;
+        }
+        //2.修改笔记状态为分享 cn_note_type_id = '2'
+        note.setCn_note_type_id("2");
+        int i = noteDao.dynamicUpdate(note);
+        if(i > 0){
+            //3.分享过的笔记插入到share表中
+            Share share = Share.builder().cn_share_id(NoteUtil.getUUID()).cn_share_title(note.getCn_note_title()).cn_share_body(note.getCn_note_body()).cn_note_id(note.getCn_note_id()).build();
+            shareDao.save(share);
+            jsonResult.setStatus(0);
+            jsonResult.setMsg("分享笔记成功");
+            return jsonResult;
+        }
+        return null;
     }
 }

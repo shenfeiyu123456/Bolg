@@ -49,7 +49,6 @@ function createBookLi(bookId,bookName){
     //在book_ul下追加li
     $("#book_ul").append($lis);
 }
-
 /**
  * 笔记本的创建
  */
