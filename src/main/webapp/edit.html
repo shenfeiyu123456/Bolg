@@ -296,6 +296,8 @@
 		<script type="text/javascript" src="scripts/note.js"></script>
 		<script type="text/javascript" src="scripts/alert.js"></script>
 		<script>
+			var keyword;
+			var page;
 			//页面加载事件
 			$(function () {
 				//1.加载用户笔记本
@@ -330,6 +332,51 @@
 				$("#can").on("click","#sure_movenote",moveNote);
 				//16.分享笔记按钮的绑定
 				$("#note_ul").on("click",".btn_share",shareNote);
+				//17.搜索分享笔记
+				$("#search_note").keydown(function (event) {
+					//获取事件源对应的key编号
+					var code = event.keyCode;
+					//enter键对应的key编号对应的是13
+					if(code == 13){
+						keyword = $("#search_note").val().trim();
+						page = 1;
+						//按下enter键清空 pc_part_6 ul
+						$("#pc_part_6 ul").empty();
+						searchSharePage(keyword,page);
+					}
+				})
+				//18.绑定更多按钮 page+1
+				$("#more_note").click(function () {
+					page = page + 1;
+					searchSharePage(keyword,page);
+				})
+				//19.查询搜索笔记列表的笔记信息
+				$("#pc_part_6 ul").on("click","li",function () {
+					$("li a").removeClass("checked");
+					$(this).find("a").addClass("checked");
+					//获取shareId
+					var shareId = $(this).data("shareId");
+					//发送Ajax
+					$.ajax({
+						url:base_path+"/note/load_share.do",
+						type:"post",
+						data:{"shareId":shareId},
+						dataType:"json",
+						success:function (result) {
+							var title = result.data.cn_share_title;
+							var body = result.data.cn_share_body;
+							//设置标题和设置body
+							$("#noput_note_title").html(title);
+							$("#noput_note_title").next().html(body);
+							//切换显示
+							$("#pc_part_5").show();
+							$("#pc_part_3").hide();
+						},
+						error:function () {
+							alert("分享笔记加载异常");
+						}
+					});
+				});
 			});
 		</script>
 		<!-- Bootstrap框架JS -->

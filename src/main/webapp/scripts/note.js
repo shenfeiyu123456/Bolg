@@ -1,5 +1,10 @@
 //根据笔记ID加载笔记列表
 function loadBookNotes() {
+    $("#pc_part_2").show();
+    $("#pc_part_4").hide();
+    $("#pc_part_6").hide();
+    $("#pc_part_7").hide();
+    $("#pc_part_8").hide();
     //清除笔记本列表的选中样式
     $("#book_ul a").removeClass("checked");
     //添加笔记本列表的选中样式
@@ -62,6 +67,8 @@ function createNoteLi(noteId,noteTitle) {
 }
 //根据笔记ID加载笔记信息
 function loadNote() {
+    $("#pc_part_3").show();
+    $("#pc_part_5").hide();
     $("#note_ul a").removeClass("checked");
     $(this).find("a").addClass("checked");
     //1.获取请求参数
@@ -279,6 +286,46 @@ function shareNote() {
         },
         error:function () {
             alert("分享笔记异常");
+        }
+    });
+}
+
+/**
+ * 搜索分享笔记模糊查询带分页
+ */
+function searchSharePage(keyword,page) {
+    $.ajax({
+        url:base_path+"/note/search_share.do",
+        type:"post",
+        data:{"keyword":keyword,"page":page},
+        dataType:"json",
+        success:function (result) {
+            //显示pc_part_6 搜索结果 板块 隐藏其他板块
+            $("#pc_part_2").hide();
+            $("#pc_part_4").hide();
+            $("#pc_part_6").show();
+            $("#pc_part_7").hide();
+            $("#pc_part_8").hide();
+            if(result.status == 0){
+                //获取服务器返回的笔记集合信息
+                var shares = result.data;
+                //循环生成shareli元素
+                for(var i = 0; i < shares.length;i++){
+                    var shareId = shares[i].cn_share_id;
+                    var shareTitle = shares[i].cn_share_title;
+                    var sli = "";
+                    sli += '<li class="online">';
+                    sli += '<a>';
+                    sli += ' <i class="fa fa-file-text-o" title="online" rel="tooltip-bottom"></i>'+shareTitle+'</a> ';
+                    sli += '</li>';
+                    var $li = $(sli);
+                    $li.data("shareId",shareId);
+                    $("#pc_part_6 ul").append($li);
+                }
+            }
+        },
+        error:function () {
+            alert("搜索分享笔记异常");
         }
     });
 }
